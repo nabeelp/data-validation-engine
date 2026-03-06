@@ -1,39 +1,32 @@
 # Task Instructions
 
 ## Task
-Create SQL migration scripts for both database tables (`validation_rules` and `validation_audit_log`) and implement the Dapper-based data access layer with full CRUD for validation rules and audit log insertion.
+Implement API endpoints for validation rules CRUD, `/api/me`, and DI/middleware wiring in Program.cs — everything except the file upload/validation endpoint.
 
 ## Scope
-- `db/001_create_validation_rules.sql` — CREATE TABLE exactly as specified in data-model-api.md
-- `db/002_create_validation_audit_log.sql` — CREATE TABLE exactly as specified in data-model-api.md
-- `Core/Models/ValidationRule.cs` — Domain model for `validation_rules` table
-- `Core/Models/ValidationAuditLog.cs` — Domain model for `validation_audit_log` table
-- `Core/Models/RuleCreateRequest.cs` — Request DTO for rule create/update
-- `Core/Interfaces/IRuleRepository.cs` — Data access interface for rules (GetAll, GetById, Create, Update, Delete, GetActiveByFileType)
-- `Core/Interfaces/IAuditLogRepository.cs` — Data access interface for audit log (Insert)
-- `Core/Services/RuleRepository.cs` — Dapper implementation of IRuleRepository
-- `Core/Services/AuditLogRepository.cs` — Dapper implementation of IAuditLogRepository
-- Add `Dapper` NuGet package to Core project
-- Add `Microsoft.Data.SqlClient` NuGet package to Core project
-- Unit tests for repository logic using an in-memory approach or verifying SQL correctness
+- `Api/Endpoints/RuleEndpoints.cs` — Map CRUD endpoints for `/api/validation-rules` with request validation
+- `Api/Endpoints/MeEndpoint.cs` — Map `/api/me` returning user identity from EasyAuth claims
+- `Api/Program.cs` — DI registration (IDbConnection, IRuleRepository, IAuditLogRepository, stub services), CORS, middleware
+- `Core/Models/UserInfo.cs` — DTO for `/api/me` response (userId, email, role)
+- `Core/Services/EasyAuthService.cs` — Parse `X-MS-CLIENT-PRINCIPAL` header into UserInfo
+- `Core/Interfaces/IEasyAuthService.cs` — Interface for EasyAuth parsing
 
 ## Out of Scope
-- API endpoint wiring (next task)
+- `/api/cds/upload/validate` endpoint (depends on validation engine)
 - Validation engine logic
 - Frontend
-- Running migrations against a real database
+- Auth middleware enforcement (just parsing; actual role checking is inline in endpoints)
 
 ## Acceptance Criteria
-- [ ] `db/001_create_validation_rules.sql` creates table with all columns, types, constraints, and defaults from data-model-api.md
-- [ ] `db/002_create_validation_audit_log.sql` creates table with all columns, types, constraints, and defaults from data-model-api.md
-- [ ] `ValidationRule` model maps all columns from `validation_rules` table
-- [ ] `ValidationAuditLog` model maps all columns from `validation_audit_log` table
-- [ ] `RuleCreateRequest` DTO includes: name, description, rule_text, scope, file_type, is_active
-- [ ] `IRuleRepository` has methods: GetAllAsync, GetByIdAsync, CreateAsync, UpdateAsync, DeleteAsync, GetActiveByFileTypeAsync
-- [ ] `IAuditLogRepository` has method: InsertAsync
-- [ ] Dapper implementations use parameterized queries (no string concatenation)
-- [ ] `updated_at` is set by application code on every write (as specified in data-model-api.md)
-- [ ] `dotnet build` succeeds with no errors
+- [ ] GET `/api/validation-rules` returns all rules; supports `?is_active=true` filter
+- [ ] POST `/api/validation-rules` creates rule, returns 201 + body; validates required fields, returns 400 on invalid input
+- [ ] PUT `/api/validation-rules/{id}` updates rule, returns 200 + body; returns 404 if not found
+- [ ] DELETE `/api/validation-rules/{id}` returns 204; returns 404 if not found
+- [ ] GET `/api/me` returns `{ userId, email, role }` from EasyAuth claims
+- [ ] Request body validation: name, rule_text, scope, file_type required; scope must be FILE/HEADER/FOOTER/RECORD; file_type must be CSV/XLSX/ALL
+- [ ] DI wiring: IDbConnection (SqlConnection), IRuleRepository, IAuditLogRepository, INotificationService (stub), IIngestionService (stub), IEasyAuthService
+- [ ] CORS configured from `Cors:AllowedOrigins` in appsettings.json
+- [ ] `dotnet build` succeeds
 - [ ] `dotnet test` passes
 
 ## Validation
