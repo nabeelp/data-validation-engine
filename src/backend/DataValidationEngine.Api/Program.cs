@@ -19,6 +19,9 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddSingleton<IEasyAuthService, EasyAuthService>();
 builder.Services.AddSingleton<INotificationService, StubNotificationService>();
 builder.Services.AddSingleton<IIngestionService, StubIngestionService>();
+builder.Services.AddSingleton<IFileParser, FileParser>();
+builder.Services.AddSingleton<IPromptBuilder, PromptBuilder>();
+builder.Services.AddScoped<IValidationEngine, ValidationEngine>();
 
 // CORS
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
@@ -38,5 +41,6 @@ app.UseCors();
 
 app.MapRuleEndpoints();
 app.MapMeEndpoint();
+app.MapUploadEndpoint();
 
 app.Run();
