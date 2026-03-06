@@ -35,7 +35,7 @@ export default function UploadPage() {
   }
 
   return (
-    <Box className="p-6 max-w-2xl mx-auto">
+    <Box className="p-6 w-4/5 mx-auto">
       <Typography variant="h5" className="mb-4">Upload CDS File</Typography>
       <Paper className="p-6">
         <Box className="flex flex-col gap-4 items-start">

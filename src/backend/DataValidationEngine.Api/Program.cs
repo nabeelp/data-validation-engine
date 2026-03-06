@@ -19,7 +19,12 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddSingleton<IEasyAuthService, EasyAuthService>();
 builder.Services.AddSingleton<INotificationService, StubNotificationService>();
 builder.Services.AddSingleton<IIngestionService, StubIngestionService>();
-builder.Services.AddSingleton<IValidationAiService, StubValidationAiService>();
+
+var openAiEndpoint = builder.Configuration["AzureOpenAI:Endpoint"];
+if (!string.IsNullOrWhiteSpace(openAiEndpoint))
+    builder.Services.AddSingleton<IValidationAiService, AzureOpenAiValidationService>();
+else
+    builder.Services.AddSingleton<IValidationAiService, StubValidationAiService>();
 builder.Services.AddSingleton<IFileParser, FileParser>();
 builder.Services.AddSingleton<IPromptBuilder, PromptBuilder>();
 builder.Services.AddScoped<IValidationEngine, ValidationEngine>();
