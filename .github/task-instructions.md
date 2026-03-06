@@ -1,1 +1,1 @@
-No task yet
+Document requirements for the solution.
