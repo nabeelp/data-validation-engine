@@ -1,34 +1,33 @@
 # Task Instructions
 
 ## Task
-Add comprehensive unit tests for the core backend services: validation engine, file parser, EasyAuth service, prompt builder, and token estimator.
+Scaffold and implement the React frontend with Vite, TypeScript, MUI, Tailwind CSS, and React Router — including Admin rule management, file upload/validation, and role-based routing.
 
 ## Scope
-- `Tests/ValidationEngineTests.cs` — Test scope ordering, short-circuit, RECORD batching, PASS/FAIL/ERROR flows, no-rules case, notification/ingestion calls
-- `Tests/FileParserTests.cs` — Test CSV and XLSX parsing, header/footer extraction, edge cases
-- `Tests/EasyAuthServiceTests.cs` — Test header parsing, missing/invalid headers
-- `Tests/PromptBuilderTests.cs` — Test system/user prompt construction
-- `Tests/TokenEstimatorTests.cs` — Test token estimation and batch size calculation
-- `Tests/Fixtures/` — Sample CSV/XLSX files and AI response JSON fixtures
+- `src/frontend/` — Vite + React 18 + TypeScript scaffold
+- `src/frontend/src/services/api.ts` — API client for all backend endpoints
+- `src/frontend/src/context/AuthContext.tsx` — Auth context fetching `/api/me` on app load
+- `src/frontend/src/pages/AdminRulesPage.tsx` — CRUD for validation rules (table + form)
+- `src/frontend/src/pages/UploadPage.tsx` — File upload with validation result display
+- `src/frontend/src/pages/NotAuthenticatedPage.tsx` — 401 fallback
+- `src/frontend/src/components/RuleForm.tsx` — Rule create/edit form with validation
+- `src/frontend/src/components/ValidationResult.tsx` — Inline error panel / success message
+- `src/frontend/src/App.tsx` — React Router with role-based route guards
+- `vite.config.ts` — Proxy `/api/*` to backend
 
 ## Out of Scope
-- Integration tests against real database
-- Frontend tests
-- Live AI service tests
+- Frontend tests (next task)
+- Production deployment config
+- EasyAuth integration testing
 
 ## Acceptance Criteria
-- [ ] ValidationEngine tests: PASS flow calls IIngestionService, FAIL flow calls INotificationService, ERROR flow calls neither
-- [ ] ValidationEngine tests: scopes processed in order FILE→HEADER→FOOTER→RECORD
-- [ ] ValidationEngine tests: short-circuit on first scope with failures
-- [ ] ValidationEngine tests: RECORD batching processes all batches, aggregates failures
-- [ ] ValidationEngine tests: no active rules → PASS with ingestion call
-- [ ] FileParser tests: CSV parsing with header/data/footer separation
-- [ ] FileParser tests: XLSX parsing with header/data/footer separation
-- [ ] FileParser tests: unsupported file type throws
-- [ ] EasyAuth tests: valid header returns UserInfo, missing header returns null
-- [ ] TokenEstimator tests: token estimation and batch size calculation
-- [ ] All tests pass: `dotnet test` exits 0 with all green
+- [ ] `npm install && npm run build` succeeds
+- [ ] Admin rules page: table with all rules, create/edit/delete, active toggle
+- [ ] Upload page: file picker, multipart upload, loading state, inline error panel
+- [ ] Role-based routing: Admin sees rules + upload, FinanceUser sees upload only
+- [ ] Auth context loads user from `/api/me`; 401 shows not-authenticated page
+- [ ] Vite proxy config routes `/api/*` to `http://localhost:5000`
+- [ ] SUCCESS: green confirmation; FAIL: red table with rule failures; ERROR: yellow warning banner
 
 ## Validation
-- [ ] `dotnet build src/backend/DataValidationEngine.slnx` exits 0
-- [ ] `dotnet test src/backend/DataValidationEngine.Tests` exits 0 with all tests passing
+- [ ] `npm run build` exits 0 in `src/frontend/`

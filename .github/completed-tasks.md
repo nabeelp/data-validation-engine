@@ -5,3 +5,4 @@
 - 2026-03-06 | Database migrations and data access layer — SQL migrations, domain models, Dapper repositories for rules and audit log
 - 2026-03-06 | API endpoints and DI wiring — Rule CRUD, /api/me, EasyAuth parsing, CORS, Program.cs DI setup
 - 2026-03-06 | Core validation engine — File parsing, scope-ordered AI validation, short-circuit, RECORD batching, upload endpoint
+- 2026-03-06 | Unit tests — ValidationEngine, FileParser, EasyAuth, PromptBuilder, TokenEstimator (28 tests passing)
