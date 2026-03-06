@@ -4,3 +4,4 @@
 - 2026-03-06 | Scaffold .NET 10 backend solution — Api, Core, Tests projects, interfaces, models, stubs, appsettings.json, .gitignore, db/ folder
 - 2026-03-06 | Database migrations and data access layer — SQL migrations, domain models, Dapper repositories for rules and audit log
 - 2026-03-06 | API endpoints and DI wiring — Rule CRUD, /api/me, EasyAuth parsing, CORS, Program.cs DI setup
+- 2026-03-06 | Core validation engine — File parsing, scope-ordered AI validation, short-circuit, RECORD batching, upload endpoint
