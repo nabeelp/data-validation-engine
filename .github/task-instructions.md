@@ -1,29 +1,41 @@
 # Task Instructions
 
 ## Task
-Scaffold the backend solution: create the .NET 10 solution structure, projects, and all interface/model definitions exactly as specified in architecture.md.
+Create SQL migration scripts for both database tables (`validation_rules` and `validation_audit_log`) and implement the Dapper-based data access layer with full CRUD for validation rules and audit log insertion.
 
 ## Scope
-- `src/backend/DataValidationEngine.Api/` — Minimal API host: `Program.cs`, empty `Endpoints/` folder, `appsettings.json` with config from architecture.md
-- `src/backend/DataValidationEngine.Core/` — Domain logic: `Models/`, `Interfaces/` (all interfaces from architecture.md), `Services/` (empty), `Stubs/` (stub implementations that log only)
-- `src/backend/DataValidationEngine.Tests/` — xUnit project: `Fixtures/` folder
-- `db/` — empty folder with a `README.md` noting it holds sequential SQL migration scripts (`001_`, `002_`, ...)
-- Solution file (`.sln`) wiring all three projects
+- `db/001_create_validation_rules.sql` — CREATE TABLE exactly as specified in data-model-api.md
+- `db/002_create_validation_audit_log.sql` — CREATE TABLE exactly as specified in data-model-api.md
+- `Core/Models/ValidationRule.cs` — Domain model for `validation_rules` table
+- `Core/Models/ValidationAuditLog.cs` — Domain model for `validation_audit_log` table
+- `Core/Models/RuleCreateRequest.cs` — Request DTO for rule create/update
+- `Core/Interfaces/IRuleRepository.cs` — Data access interface for rules (GetAll, GetById, Create, Update, Delete, GetActiveByFileType)
+- `Core/Interfaces/IAuditLogRepository.cs` — Data access interface for audit log (Insert)
+- `Core/Services/RuleRepository.cs` — Dapper implementation of IRuleRepository
+- `Core/Services/AuditLogRepository.cs` — Dapper implementation of IAuditLogRepository
+- Add `Dapper` NuGet package to Core project
+- Add `Microsoft.Data.SqlClient` NuGet package to Core project
+- Unit tests for repository logic using an in-memory approach or verifying SQL correctness
 
 ## Out of Scope
-- Any actual service logic (validation engine, file parsing, AI integration)
-- Database migrations
+- API endpoint wiring (next task)
+- Validation engine logic
 - Frontend
-- Tests beyond project scaffold
+- Running migrations against a real database
 
 ## Acceptance Criteria
-- [ ] `dotnet build` succeeds with no errors across all three projects
-- [ ] All interfaces from architecture.md are defined: `IValidationAiService`, `INotificationService`, `IIngestionService`
-- [ ] All records from architecture.md are defined: `AiValidationResponse`, `AiRuleResult`, `RuleFailureDetail`
-- [ ] Stub implementations of `INotificationService` and `IIngestionService` exist in `Core/Stubs/` and log their inputs via `ILogger<T>`
-- [ ] `appsettings.json` matches the schema in architecture.md exactly
-- [ ] `.gitignore` excludes `appsettings.Development.json` and standard .NET build artefacts
+- [ ] `db/001_create_validation_rules.sql` creates table with all columns, types, constraints, and defaults from data-model-api.md
+- [ ] `db/002_create_validation_audit_log.sql` creates table with all columns, types, constraints, and defaults from data-model-api.md
+- [ ] `ValidationRule` model maps all columns from `validation_rules` table
+- [ ] `ValidationAuditLog` model maps all columns from `validation_audit_log` table
+- [ ] `RuleCreateRequest` DTO includes: name, description, rule_text, scope, file_type, is_active
+- [ ] `IRuleRepository` has methods: GetAllAsync, GetByIdAsync, CreateAsync, UpdateAsync, DeleteAsync, GetActiveByFileTypeAsync
+- [ ] `IAuditLogRepository` has method: InsertAsync
+- [ ] Dapper implementations use parameterized queries (no string concatenation)
+- [ ] `updated_at` is set by application code on every write (as specified in data-model-api.md)
+- [ ] `dotnet build` succeeds with no errors
+- [ ] `dotnet test` passes
 
 ## Validation
-- [ ] `dotnet build src/backend/DataValidationEngine.sln` exits 0
-- [ ] `dotnet test src/backend/DataValidationEngine.Tests` exits 0 (no tests yet, but project must load)
+- [ ] `dotnet build src/backend/DataValidationEngine.slnx` exits 0
+- [ ] `dotnet test src/backend/DataValidationEngine.Tests` exits 0
