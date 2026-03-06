@@ -19,6 +19,7 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddSingleton<IEasyAuthService, EasyAuthService>();
 builder.Services.AddSingleton<INotificationService, StubNotificationService>();
 builder.Services.AddSingleton<IIngestionService, StubIngestionService>();
+builder.Services.AddSingleton<IValidationAiService, StubValidationAiService>();
 builder.Services.AddSingleton<IFileParser, FileParser>();
 builder.Services.AddSingleton<IPromptBuilder, PromptBuilder>();
 builder.Services.AddScoped<IValidationEngine, ValidationEngine>();
