@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="DataValidationEngine.Api/DataValidationEngine.Api.csproj" />
+  <Project Path="DataValidationEngine.Core/DataValidationEngine.Core.csproj" />
+  <Project Path="DataValidationEngine.Tests/DataValidationEngine.Tests.csproj" />
+</Solution>
