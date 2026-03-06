@@ -6,3 +6,4 @@
 - 2026-03-06 | API endpoints and DI wiring — Rule CRUD, /api/me, EasyAuth parsing, CORS, Program.cs DI setup
 - 2026-03-06 | Core validation engine — File parsing, scope-ordered AI validation, short-circuit, RECORD batching, upload endpoint
 - 2026-03-06 | Unit tests — ValidationEngine, FileParser, EasyAuth, PromptBuilder, TokenEstimator (28 tests passing)
+- 2026-03-06 | React frontend — Admin rules CRUD, file upload/validation, role-based routing, MUI + Tailwind
