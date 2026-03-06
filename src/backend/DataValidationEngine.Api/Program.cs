@@ -38,6 +38,29 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// In Development, inject a fake EasyAuth header so the app is testable without Azure
+if (app.Environment.IsDevelopment())
+{
+    app.Use(async (context, next) =>
+    {
+        if (!context.Request.Headers.ContainsKey("X-MS-CLIENT-PRINCIPAL"))
+        {
+            var fakePrincipal = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                claims = new[]
+                {
+                    new { typ = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", val = "dev-user" },
+                    new { typ = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", val = "dev@localhost" },
+                    new { typ = "roles", val = "Admin" }
+                }
+            });
+            context.Request.Headers["X-MS-CLIENT-PRINCIPAL"] =
+                Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(fakePrincipal));
+        }
+        await next();
+    });
+}
+
 app.UseCors();
 
 app.MapRuleEndpoints();
