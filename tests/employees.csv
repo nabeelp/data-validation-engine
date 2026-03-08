@@ -1,0 +1,8 @@
+EmployeeID,FirstName,LastName,Email,Department,StartDate,Salary
+E001,Alice,Smith,alice.smith@example.com,Engineering,2022-03-15,95000
+E002,Bob,Jones,bob.jones@example.com,Marketing,2021-07-01,72000
+E003,,Williams,carol.williams@example.com,HR,2023-01-10,68000
+E004,Dave,Brown,not-an-email,Finance,2020-11-22,110000
+E005,Eve,Davis,eve.davis@example.com,Engineering,2025-13-01,85000
+E006,Frank,Miller,frank.miller@example.com,Sales,,62000
+TOTAL,,,,,,492000
