@@ -4,20 +4,28 @@ An AI-driven validation engine for CDS (Corporate Data System) file uploads. Fin
 
 ## Table of Contents
 
-- [Features](#features)
-- [Architecture Overview](#architecture-overview)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-  - [Database Setup](#database-setup)
-  - [Backend Setup](#backend-setup)
-  - [Frontend Setup](#frontend-setup)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-- [Testing](#testing)
-- [API Reference](#api-reference)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
+- [Data Validation Engine](#data-validation-engine)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+  - [Architecture Overview](#architecture-overview)
+  - [Prerequisites](#prerequisites)
+  - [Getting Started](#getting-started)
+    - [Database Setup](#database-setup)
+    - [Backend Setup](#backend-setup)
+    - [Frontend Setup](#frontend-setup)
+  - [Configuration](#configuration)
+  - [Running the Application](#running-the-application)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+    - [Production Build (Frontend)](#production-build-frontend)
+  - [Testing](#testing)
+    - [Backend Tests](#backend-tests)
+    - [Frontend Tests](#frontend-tests)
+    - [Frontend Linting](#frontend-linting)
+  - [API Reference](#api-reference)
+  - [Project Structure](#project-structure)
+  - [Contributing](#contributing)
+  - [License](#license)
 
 ---
 
@@ -68,6 +76,20 @@ An AI-driven validation engine for CDS (Corporate Data System) file uploads. Fin
 ## Getting Started
 
 ### Database Setup
+
+Start a local SQL Server instance in Docker:
+
+```bash
+docker run --name data-validation-engine-sql -e ACCEPT_EULA=Y -e MSSQL_SA_PASSWORD=Dev@12345 -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+If you already created the container and just need to start it again:
+
+```bash
+docker start data-validation-engine-sql
+```
+
+The development connection string in `src/backend/DataValidationEngine.Api/appsettings.Development.json` is already configured for `localhost,1433` with the password above.
 
 Apply the migration scripts in the `db/` directory in order against your SQL Server database:
 
@@ -135,6 +157,14 @@ In production, configure secrets via Azure App Service Configuration settings. T
 ---
 
 ## Running the Application
+
+From the repository root, you can start the local SQL Server container, backend, and frontend together with:
+
+```powershell
+.\start.ps1
+```
+
+If Docker is available, the script will create or start a local `data-validation-engine-sql` container before launching the backend and frontend.
 
 ### Backend
 
