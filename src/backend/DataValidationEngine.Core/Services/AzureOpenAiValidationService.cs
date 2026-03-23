@@ -28,7 +28,14 @@ public class AzureOpenAiValidationService : IValidationAiService
             ?? throw new InvalidOperationException("AzureOpenAI:Endpoint is not configured.");
         var deploymentName = config["AzureOpenAI:DeploymentName"] ?? "gpt-4o";
 
-        var azureClient = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential());
+        // If config contains a TenantID, use that with the DefaultAzureCredential. This allows for more flexible authentication scenarios (e.g., using a specific service principal).
+        // If no TenantID is provided, DefaultAzureCredential will fall back to other authentication methods, which may include Managed Identity if running in Azure.
+        var tenantId = config["AzureOpenAI:TenantId"];
+        var credential = string.IsNullOrEmpty(tenantId)
+            ? new DefaultAzureCredential()
+            : new DefaultAzureCredential(new DefaultAzureCredentialOptions { TenantId = tenantId });
+
+        var azureClient = new AzureOpenAIClient(new Uri(endpoint), credential);
         _chatClient = azureClient.GetChatClient(deploymentName);
     }
 
