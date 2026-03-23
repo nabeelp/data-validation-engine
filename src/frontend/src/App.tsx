@@ -1,14 +1,55 @@
+import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { AppBar, Box, Button, CircularProgress, Toolbar, Typography } from '@mui/material';
+import { Alert, AppBar, Box, Button, CircularProgress, Toolbar, Typography } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import AdminRulesPage from './pages/AdminRulesPage';
 import UploadPage from './pages/UploadPage';
 import NotAuthenticatedPage from './pages/NotAuthenticatedPage';
+import { getDatabaseStatus, initializeDatabase } from './services/api';
 
 function AppRoutes() {
   const { user, loading, error } = useAuth();
+  const [databaseLoading, setDatabaseLoading] = useState(true);
+  const [databaseError, setDatabaseError] = useState<string | null>(null);
+  const initStarted = useRef(false);
 
-  if (loading) {
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
+
+    if (error || !user) {
+      setDatabaseLoading(false);
+      return;
+    }
+
+    if (initStarted.current) {
+      return;
+    }
+
+    initStarted.current = true;
+
+    const bootstrapDatabase = async () => {
+      try {
+        const status = await getDatabaseStatus();
+        if (!status.exists) {
+          await initializeDatabase();
+        }
+        setDatabaseError(null);
+      } catch (bootstrapError) {
+        const message = bootstrapError instanceof Error
+          ? bootstrapError.message
+          : 'Database initialization failed.';
+        setDatabaseError(message);
+      } finally {
+        setDatabaseLoading(false);
+      }
+    };
+
+    bootstrapDatabase();
+  }, [error, loading, user]);
+
+  if (loading || databaseLoading) {
     return (
       <Box className="flex items-center justify-center min-h-screen">
         <CircularProgress />
@@ -18,6 +59,16 @@ function AppRoutes() {
 
   if (error || !user) {
     return <NotAuthenticatedPage />;
+  }
+
+  if (databaseError) {
+    return (
+      <Box className="min-h-screen p-6 flex items-center justify-center">
+        <Box className="max-w-xl w-full">
+          <Alert severity="error">{databaseError}</Alert>
+        </Box>
+      </Box>
+    );
   }
 
   return (

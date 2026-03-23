@@ -99,6 +99,10 @@ sqlcmd -S <server> -d <database> -i db/001_create_validation_rules.sql
 sqlcmd -S <server> -d <database> -i db/002_create_validation_audit_log.sql
 ```
 
+You can also initialize the configured database from the Admin UI after the backend is running. The `Initialize Database` action creates the target database when it does not exist, creates the required tables, and seeds the sample validation rules used in the local smoke-test flow.
+
+On first site load, the frontend now checks whether the configured database exists and triggers the same initialization flow automatically when it does not.
+
 ### Backend Setup
 
 ```bash
@@ -233,11 +237,13 @@ npm run lint
 
 | Method | Path | Role | Description |
 |--------|------|------|-------------|
+| `GET` | `/api/database/status` | Authenticated | Checks whether the configured database exists |
 | `GET` | `/api/me` | Any | Returns the current user's identity and role |
 | `GET` | `/api/validation-rules` | Admin | Lists all rules (`?is_active=true` to filter) |
 | `POST` | `/api/validation-rules` | Admin | Creates a new validation rule |
 | `PUT` | `/api/validation-rules/{id}` | Admin | Updates an existing rule |
 | `DELETE` | `/api/validation-rules/{id}` | Admin | Deletes a rule |
+| `POST` | `/api/admin/database/initialize` | Authenticated | Creates the database artefacts and seeds the sample rules |
 | `POST` | `/api/cds/upload/validate` | Finance User | Uploads a CSV/XLSX file and runs validation |
 
 Full request/response schemas are documented in [`docs/data-model-api.md`](docs/data-model-api.md).

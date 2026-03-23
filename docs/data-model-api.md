@@ -62,10 +62,12 @@ SQL Server. Dapper. Migrations in `db/`.
 
 | Method | Path | Role | Description |
 |---|---|---|---|
+| GET | `/api/database/status` | Authenticated | Check whether the configured SQL Server database exists. |
 | GET | `/api/validation-rules` | Admin | List rules. Supports `?is_active=true`. |
 | POST | `/api/validation-rules` | Admin | Create rule. |
 | PUT | `/api/validation-rules/{id}` | Admin | Update rule. |
 | DELETE | `/api/validation-rules/{id}` | Admin | Delete rule. |
+| POST | `/api/admin/database/initialize` | Authenticated | Create the configured SQL Server database and tables if needed, then seed sample validation rules. |
 | GET | `/api/me` | Any authenticated | Returns current user identity and role from EasyAuth claims. |
 | POST | `/api/cds/upload/validate` | Finance User | Upload file (multipart) + trigger validation. Returns JSON below. |
 
@@ -109,6 +111,26 @@ Validation:
   "userId": "<string>",
   "email": "<string>",
   "role": "Admin | FinanceUser"
+}
+```
+
+### `/api/admin/database/initialize` Response Contract
+
+```json
+{
+  "databaseCreated": true,
+  "tablesCreated": 2,
+  "sampleRulesInserted": 5,
+  "sampleRulesSkipped": 0,
+  "sampleRulesTotal": 5
+}
+```
+
+### `/api/database/status` Response Contract
+
+```json
+{
+  "exists": true
 }
 ```
 

@@ -46,6 +46,18 @@ export interface ValidationResponse {
   failures: RuleFailureDetail[];
 }
 
+export interface DatabaseInitializationResponse {
+  databaseCreated: boolean;
+  tablesCreated: number;
+  sampleRulesInserted: number;
+  sampleRulesSkipped: number;
+  sampleRulesTotal: number;
+}
+
+export interface DatabaseStatusResponse {
+  exists: boolean;
+}
+
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const text = await res.text();
@@ -90,6 +102,18 @@ export async function deleteRule(id: string): Promise<void> {
     const text = await res.text();
     throw new Error(text || `HTTP ${res.status}`);
   }
+}
+
+export async function initializeDatabase(): Promise<DatabaseInitializationResponse> {
+  const res = await fetch(`${API_BASE}/admin/database/initialize`, {
+    method: 'POST',
+  });
+  return handleResponse<DatabaseInitializationResponse>(res);
+}
+
+export async function getDatabaseStatus(): Promise<DatabaseStatusResponse> {
+  const res = await fetch(`${API_BASE}/database/status`);
+  return handleResponse<DatabaseStatusResponse>(res);
 }
 
 export async function uploadAndValidate(file: File): Promise<ValidationResponse> {

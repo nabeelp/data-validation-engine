@@ -35,6 +35,8 @@ React 18 + Vite + TypeScript. MUI for components. Tailwind for utility CSS. Reac
 
 - Table view of all rules with edit/delete actions and active toggle.
 - Inline validation of required fields before save.
+- Include an admin action to initialize the configured database from the UI. The action creates the SQL Server database and required tables when missing, seeds the documented sample rules, and surfaces success or failure inline on the page.
+- On app load, check whether the configured database exists. If it does not, automatically initialize the database before rendering the main routes so the first rule-management request does not fail on a missing database.
 ## Upload & Validation UI
 
 - Route: `/upload`

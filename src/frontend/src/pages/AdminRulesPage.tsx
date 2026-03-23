@@ -1,21 +1,43 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Box, Button, Chip, Dialog, DialogContent, DialogTitle, IconButton, Paper,
-  Switch, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
+  Alert, Box, Button, Chip, CircularProgress, Dialog, DialogContent, DialogTitle,
+  IconButton, Paper, Stack, Switch, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Typography,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RuleForm from '../components/RuleForm';
-import { createRule, deleteRule, getRules, updateRule, type RuleCreateRequest, type ValidationRule } from '../services/api';
+import {
+  createRule,
+  deleteRule,
+  getRules,
+  initializeDatabase,
+  updateRule,
+  type RuleCreateRequest,
+  type ValidationRule,
+} from '../services/api';
+
+type StatusMessage = {
+  severity: 'success' | 'error' | 'info';
+  text: string;
+};
 
 export default function AdminRulesPage() {
   const [rules, setRules] = useState<ValidationRule[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<ValidationRule | null>(null);
+  const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   const loadRules = useCallback(async () => {
-    setRules(await getRules());
+    try {
+      setRules(await getRules());
+    } catch (error) {
+      setRules([]);
+      const message = error instanceof Error ? error.message : 'Unable to load validation rules.';
+      setStatusMessage({ severity: 'error', text: message });
+    }
   }, []);
 
   useEffect(() => { loadRules(); }, [loadRules]);
@@ -23,6 +45,7 @@ export default function AdminRulesPage() {
   async function handleCreate(data: RuleCreateRequest) {
     await createRule(data);
     setDialogOpen(false);
+    setStatusMessage(null);
     await loadRules();
   }
 
@@ -31,12 +54,14 @@ export default function AdminRulesPage() {
     await updateRule(editingRule.id, data);
     setEditingRule(null);
     setDialogOpen(false);
+    setStatusMessage(null);
     await loadRules();
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this rule?')) return;
     await deleteRule(id);
+    setStatusMessage(null);
     await loadRules();
   }
 
@@ -45,7 +70,27 @@ export default function AdminRulesPage() {
       name: rule.name, description: rule.description, ruleText: rule.ruleText,
       scope: rule.scope, fileType: rule.fileType, isActive: !rule.isActive,
     });
+    setStatusMessage(null);
     await loadRules();
+  }
+
+  async function handleInitializeDatabase() {
+    setIsInitializing(true);
+    setStatusMessage(null);
+
+    try {
+      const result = await initializeDatabase();
+      setStatusMessage({
+        severity: 'success',
+        text: `${result.databaseCreated ? 'Database created.' : 'Database already existed.'} ${result.tablesCreated} table(s) created. ${result.sampleRulesInserted} sample rule(s) inserted, ${result.sampleRulesSkipped} already present.`,
+      });
+      await loadRules();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Database initialization failed.';
+      setStatusMessage({ severity: 'error', text: message });
+    } finally {
+      setIsInitializing(false);
+    }
   }
 
   function openCreate() {
@@ -60,10 +105,31 @@ export default function AdminRulesPage() {
 
   return (
     <Box className="p-6">
-      <Box className="flex justify-between items-center mb-4">
-        <Typography variant="h5">Validation Rules</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Add Rule</Button>
+      <Box className="flex justify-between items-center mb-4 gap-4 flex-wrap">
+        <Box>
+          <Typography variant="h5">Validation Rules</Typography>
+          <Typography variant="body2" color="text.secondary">
+            Initialize the configured SQL Server database, create the required tables, and seed sample validation rules.
+          </Typography>
+        </Box>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="outlined"
+            onClick={handleInitializeDatabase}
+            disabled={isInitializing}
+            startIcon={isInitializing ? <CircularProgress size={16} color="inherit" /> : undefined}
+          >
+            {isInitializing ? 'Initializing...' : 'Initialize Database'}
+          </Button>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Add Rule</Button>
+        </Stack>
       </Box>
+
+      {statusMessage && (
+        <Alert severity={statusMessage.severity} className="mb-4">
+          {statusMessage.text}
+        </Alert>
+      )}
 
       <TableContainer component={Paper}>
         <Table>

@@ -16,6 +16,8 @@ builder.Services.AddScoped<IRuleRepository, RuleRepository>();
 builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 
 // Services
+builder.Services.AddSingleton<IDatabaseSchemaInitializer, SqlServerDatabaseSchemaInitializer>();
+builder.Services.AddScoped<IDatabaseInitializationService, DatabaseInitializationService>();
 builder.Services.AddSingleton<IEasyAuthService, EasyAuthService>();
 builder.Services.AddSingleton<INotificationService, StubNotificationService>();
 builder.Services.AddSingleton<IIngestionService, StubIngestionService>();
@@ -69,6 +71,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors();
 
 app.MapRuleEndpoints();
+app.MapDatabaseSetupEndpoints();
 app.MapMeEndpoint();
 app.MapUploadEndpoint();
 

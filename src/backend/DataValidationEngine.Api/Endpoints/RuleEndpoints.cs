@@ -15,14 +15,22 @@ public static class RuleEndpoints
     {
         var group = app.MapGroup("/api/validation-rules");
 
-        group.MapGet("/", async (bool? is_active, IRuleRepository repo) =>
+        group.MapGet("/", async (HttpContext context, IEasyAuthService easyAuth, bool? is_active, IRuleRepository repo) =>
         {
+            var authResult = EndpointAuthorization.RequireRole(context, easyAuth, "Admin");
+            if (authResult is not null)
+                return authResult;
+
             var rules = await repo.GetAllAsync(is_active);
             return Results.Ok(rules);
         });
 
-        group.MapPost("/", async (RuleCreateRequest request, IRuleRepository repo) =>
+        group.MapPost("/", async (HttpContext context, IEasyAuthService easyAuth, RuleCreateRequest request, IRuleRepository repo) =>
         {
+            var authResult = EndpointAuthorization.RequireRole(context, easyAuth, "Admin");
+            if (authResult is not null)
+                return authResult;
+
             var error = ValidateRequest(request);
             if (error is not null)
                 return error;
@@ -31,8 +39,12 @@ public static class RuleEndpoints
             return Results.Created($"/api/validation-rules/{rule.Id}", rule);
         });
 
-        group.MapPut("/{id:guid}", async (Guid id, RuleCreateRequest request, IRuleRepository repo) =>
+        group.MapPut("/{id:guid}", async (HttpContext context, IEasyAuthService easyAuth, Guid id, RuleCreateRequest request, IRuleRepository repo) =>
         {
+            var authResult = EndpointAuthorization.RequireRole(context, easyAuth, "Admin");
+            if (authResult is not null)
+                return authResult;
+
             var error = ValidateRequest(request);
             if (error is not null)
                 return error;
@@ -44,8 +56,12 @@ public static class RuleEndpoints
             return Results.Ok(rule);
         });
 
-        group.MapDelete("/{id:guid}", async (Guid id, IRuleRepository repo) =>
+        group.MapDelete("/{id:guid}", async (HttpContext context, IEasyAuthService easyAuth, Guid id, IRuleRepository repo) =>
         {
+            var authResult = EndpointAuthorization.RequireRole(context, easyAuth, "Admin");
+            if (authResult is not null)
+                return authResult;
+
             var deleted = await repo.DeleteAsync(id);
             if (!deleted)
                 return Results.NotFound();
